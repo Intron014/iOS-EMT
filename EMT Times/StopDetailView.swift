@@ -10,6 +10,8 @@ struct CoordinateItem: Identifiable {
     let id = UUID()
     let coordinate: CLLocationCoordinate2D
     let type: CoordinateType
+    let lineNumber: String?
+    
     var markerTintColor: Color {
         type == .station ? .red : .blue
     }
@@ -25,6 +27,7 @@ struct StopDetailView: View {
     @Query private var credentials: [Credentials]
     @State private var region: MKCoordinateRegion
     @AppStorage("mapPosition") private var mapPosition = "top"
+    @AppStorage("showBusDistances") private var showBusDistances = true
     
     init(stopId: String, stationCoordinates: CLLocationCoordinate2D) {
         self.stopId = stopId
@@ -58,13 +61,13 @@ struct StopDetailView: View {
     
     private var mapItems: [CoordinateItem] {
         var items = [
-            CoordinateItem(coordinate: stationCoordinates, type: .station)
+            CoordinateItem(coordinate: stationCoordinates, type: .station, lineNumber: nil)
         ]
         if let data = arrivalData {
             for arrival in data.Arrive {
                 let coords = arrival.geometry.coordinates
                 let busCoords = CLLocationCoordinate2D(latitude: coords[1], longitude: coords[0])
-                items.append(CoordinateItem(coordinate: busCoords, type: .bus))
+                items.append(CoordinateItem(coordinate: busCoords, type: .bus, lineNumber: arrival.line))
             }
         }
         return items
@@ -77,7 +80,7 @@ struct StopDetailView: View {
                     Marker("Stop", coordinate: item.coordinate)
                         .tint(item.markerTintColor)
                 } else {
-                    Marker("Bus", systemImage: "bus.fill", coordinate: item.coordinate)
+                    Marker(item.lineNumber ?? "Bus", systemImage: "bus.fill", coordinate: item.coordinate)
                         .tint(item.markerTintColor)
                 }
             }
@@ -115,8 +118,10 @@ struct StopDetailView: View {
                                             .foregroundColor(.secondary)
                                     }
                                     Text("To: \(arrival.destination)")
-                                    Text("Distance: \(arrival.DistanceBus)m")
-                                        .font(.caption)
+                                    if showBusDistances {
+                                        Text("Distance: \(arrival.DistanceBus)m")
+                                            .font(.caption)
+                                    }
                                 }
                                 .padding(.vertical, 4)
                             }

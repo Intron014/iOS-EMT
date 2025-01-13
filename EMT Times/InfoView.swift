@@ -5,6 +5,7 @@ struct InfoView: View {
     @Environment(\.dismiss) var dismiss
     @State private var showingCredentials = false
     @AppStorage("mapPosition") private var mapPosition = "top"
+    @AppStorage("showBusDistances") var showBusDistances = true
     let apiStats: ApiCounter?
     var refreshCallback: (() -> Void)? = nil
     
@@ -18,6 +19,9 @@ struct InfoView: View {
                         Text("Hidden").tag("hidden")
                     }
                     .pickerStyle(MenuPickerStyle())
+                    
+                    Toggle("Show Bus Distances", isOn: $showBusDistances)
+                    
                     Button("Manage API Credentials") {
                         showingCredentials = true
                     }
