@@ -99,7 +99,8 @@ struct ContentView: View {
 
     @ViewBuilder
     private func stationRow(for station: Station) -> some View {
-        NavigationLink(destination: StopDetailView(stopId: station.id)) {
+        NavigationLink(destination: StopDetailView(stopId: station.id,
+                                                  stationCoordinates: station.coordinates)) {
             VStack(alignment: .leading) {
                 if let favorite = favorites.first(where: { $0.stationId == station.id }) {
                     Text(favorite.customName ?? station.name)

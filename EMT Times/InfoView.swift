@@ -4,6 +4,7 @@ import SwiftData
 struct InfoView: View {
     @Environment(\.dismiss) var dismiss
     @State private var showingCredentials = false
+    @AppStorage("mapPosition") private var mapPosition = "top"
     let apiStats: ApiCounter?
     var refreshCallback: (() -> Void)? = nil
     
@@ -11,6 +12,12 @@ struct InfoView: View {
         NavigationView {
             List {
                 Section("Settings") {
+                    Picker("Map Position", selection: $mapPosition) {
+                        Text("Top").tag("top")
+                        Text("Below").tag("below")
+                        Text("Hidden").tag("hidden")
+                    }
+                    .pickerStyle(MenuPickerStyle())
                     Button("Manage API Credentials") {
                         showingCredentials = true
                     }

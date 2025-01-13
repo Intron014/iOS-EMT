@@ -129,6 +129,7 @@ struct Arrival: Codable, Identifiable {
     var id: String { "\(line)-\(bus)" }
     let line: String
     let stop: String
+    let geometry: Geometry
     let destination: String
     let estimateArrive: Int
     let DistanceBus: Int
