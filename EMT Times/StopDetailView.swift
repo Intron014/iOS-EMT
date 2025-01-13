@@ -13,9 +13,6 @@ struct CoordinateItem: Identifiable {
     var markerTintColor: Color {
         type == .station ? .red : .blue
     }
-    var glyphImage: String {
-        type == .station ? "" : "bus.fill"
-    }
 }
 
 struct StopDetailView: View {
@@ -74,9 +71,16 @@ struct StopDetailView: View {
     }
 
     private var mapView: some View {
-        Map(coordinateRegion: $region, annotationItems: mapItems) { item in
-            MapMarker(coordinate: item.coordinate, 
-                     tint: item.markerTintColor)
+        Map {
+            ForEach(mapItems) { item in
+                if item.type == .station {
+                    Marker("Stop", coordinate: item.coordinate)
+                        .tint(item.markerTintColor)
+                } else {
+                    Marker("Bus", systemImage: "bus.fill", coordinate: item.coordinate)
+                        .tint(item.markerTintColor)
+                }
+            }
         }
         .frame(height: 200)
         .cornerRadius(10)

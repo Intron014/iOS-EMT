@@ -56,7 +56,7 @@ struct CredentialsView: View {
     private func validateAndSave() async {
         do {
             // Try to get a token with the provided credentials
-            let token = try await TokenManager.shared.validateCredentials(
+            var token = try await TokenManager.shared.validateCredentials(
                 clientId: clientId,
                 passkey: passkey
             )

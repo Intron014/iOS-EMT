@@ -25,7 +25,7 @@ struct InfoView: View {
                 
                 Section("Developer") {
                     Text("Developer: Jorge Benjumea")
-                    Text("Version: 1.0")
+                    Text("Version: 1.1")
                     Link("GitHub: @intron014", destination: URL(string: "https://github.com/intron014")!)
                 }
                 
