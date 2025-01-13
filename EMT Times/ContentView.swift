@@ -8,7 +8,6 @@
 import SwiftUI
 import SwiftData
 import CoreLocation
-import WidgetKit
 
 enum SortOrder {
     case nearToFar
@@ -196,13 +195,6 @@ struct ContentView: View {
                 }
                 .tint(.yellow)
             }
-            
-            Button {
-                setWidgetStop(station)
-            } label: {
-                Label("Set as Widget", systemImage: "apps.iphone")
-            }
-            .tint(.purple)
         }
     }
 
@@ -214,14 +206,6 @@ struct ContentView: View {
     private func removeFavorite(_ station: Station) {
         if let favorite = favorites.first(where: { $0.stationId == station.id }) {
             modelContext.delete(favorite)
-        }
-    }
-
-    private func setWidgetStop(_ station: Station) {
-        if let defaults = UserDefaults(suiteName: "group.com.yourapp.emttimes") {
-            defaults.set(station.id, forKey: "selectedStopId")
-            defaults.set(station.name, forKey: "selectedStopName")
-            WidgetCenter.shared.reloadAllTimelines()
         }
     }
 
