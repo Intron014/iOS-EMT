@@ -10,23 +10,44 @@ import SwiftData
 
 @main
 struct EMT_TimesApp: App {
-    var sharedModelContainer: ModelContainer = {
-        let schema = Schema([
-            Item.self,
-        ])
-        let modelConfiguration = ModelConfiguration(schema: schema, isStoredInMemoryOnly: false)
-
+    let modelContainer: ModelContainer
+    @State private var showingCredentials = false
+    
+    init() {
         do {
-            return try ModelContainer(for: schema, configurations: [modelConfiguration])
+            let schema = Schema([
+                Credentials.self,
+                FavoriteStation.self
+            ])
+            let modelConfiguration = ModelConfiguration(schema: schema)
+            modelContainer = try ModelContainer(for: schema, configurations: [modelConfiguration])
         } catch {
-            fatalError("Could not create ModelContainer: \(error)")
+            fatalError("Could not initialize ModelContainer: \(error)")
         }
-    }()
-
+    }
+    
     var body: some Scene {
         WindowGroup {
             ContentView()
+                .onAppear {
+                    checkCredentials()
+                }
+                .sheet(isPresented: $showingCredentials) {
+                    CredentialsView(isPresented: $showingCredentials)
+                }
         }
-        .modelContainer(sharedModelContainer)
+        .modelContainer(modelContainer)
+    }
+    
+    private func checkCredentials() {
+        let context = modelContainer.mainContext
+        let descriptor = FetchDescriptor<Credentials>()
+        
+        do {
+            let credentials = try context.fetch(descriptor)
+            showingCredentials = credentials.isEmpty
+        } catch {
+            showingCredentials = true
+        }
     }
 }

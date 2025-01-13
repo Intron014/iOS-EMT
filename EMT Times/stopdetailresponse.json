@@ -1,0 +1,29 @@
+{
+    "code": "00",
+    "data": [{
+        "stops": [{
+            "pmv": "61242",
+            "name": "Cibeles",
+            "geometry": {
+                "type": "Point",
+                "coordinates": [-3.69214452424823, 40.4203613685499]
+            },
+            "stop": "72",
+            "dataLine": [{
+                "headerB": "CHAMARTIN",
+                "direction": "B",
+                "headerA": "SOL/SEVILLA",
+                "label": "5",
+                "stopTime": "22:58",
+                "minFreq": "9",
+                "startTime": "06:30",
+                "maxFreq": "20",
+                "dayType": "LA",
+                "line": "005"
+            }],
+            "postalAddress": "Pº de Recoletos, 2 (Pza. de Cibeles)"
+        }]
+    }],
+    "description": "Data recovered OK",
+    "datetime": "2024-01-13T15:20:14.096428"
+}

@@ -1,0 +1,27 @@
+{
+    "code": "00",
+    "data": [
+        {
+            "node": "1",
+            "geometry": {
+                "type": "Point",
+                "coordinates": [-3.782776719960321, 40.47005438829035]
+            },
+            "wifi": "0",
+            "lines": ["161/1/1"],
+            "name": "Avenida Valdemarín-Blanca de Castilla"
+        },
+        {
+            "node": "72",
+            "geometry": {
+                "type": "Point",
+                "coordinates": [-3.692039901493752, 40.420272966069064]
+            },
+            "wifi": "0",
+            "lines": ["5/1/1", "14/1/1", "27/1/1"],
+            "name": "Cibeles"
+        }
+    ],
+    "description": "Data recovered OK",
+    "datetime": "2024-01-13T15:20:14.096428"
+}
