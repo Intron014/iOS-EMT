@@ -33,12 +33,13 @@ struct ApiCounter: Codable {
     let licenceUse: String
 }
 
-struct Station: Codable, Identifiable {
+class Station: Codable, Identifiable {
     let id: String
     let name: String
     let coordinates: CLLocationCoordinate2D
     let wifi: String
     let lines: [String]
+    var distance: CLLocationDistance?  
     
     enum CodingKeys: String, CodingKey {
         case id = "node"
@@ -52,7 +53,7 @@ struct Station: Codable, Identifiable {
         case coordinates
     }
     
-    init(from decoder: Decoder) throws {
+    required init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
         id = try container.decode(String.self, forKey: .id)
         name = try container.decode(String.self, forKey: .name)

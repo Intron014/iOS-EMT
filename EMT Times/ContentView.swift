@@ -7,6 +7,13 @@
 
 import SwiftUI
 import SwiftData
+import CoreLocation
+
+enum SortOrder {
+    case nearToFar
+    case farToNear
+    case alphabetical
+}
 
 struct ContentView: View {
     @State private var errorMessage: String?
@@ -22,20 +29,46 @@ struct ContentView: View {
     @State private var tempCustomName = ""
     @State private var showingInfo = false
     @Query private var credentials: [Credentials]
+    @StateObject private var locationManager = LocationManager()
+    @State private var sortOrder: SortOrder = .nearToFar
+    @State private var showFavoritesOnly = false
+    @State private var showingSortOptions = false
 
     var sortedStations: ([Station], [Station]) {
-        let favoriteIds = Set(favorites.map { $0.stationId })
-        let favs = stations.filter { favoriteIds.contains($0.id) }
-        let others = stations.filter { !favoriteIds.contains($0.id) }
+        var stationsToSort = self.stations
         
-        if searchText.isEmpty {
-            return (favs, others)
+        // Filter by search text
+        if !searchText.isEmpty {
+            stationsToSort = stationsToSort.filter { $0.id.contains(searchText) || 
+                                                   $0.name.localizedCaseInsensitiveContains(searchText) }
         }
         
-        return (
-            favs.filter { $0.id.contains(searchText) || $0.name.localizedCaseInsensitiveContains(searchText) },
-            others.filter { $0.id.contains(searchText) || $0.name.localizedCaseInsensitiveContains(searchText) }
-        )
+        // Update distances
+        if let userLocation = locationManager.location {
+            for station in stationsToSort {
+                let stationLocation = CLLocation(latitude: station.coordinates.latitude,
+                                               longitude: station.coordinates.longitude)
+                station.distance = userLocation.distance(from: stationLocation)
+            }
+        }
+        
+        // Sort stations
+        stationsToSort.sort {
+            switch sortOrder {
+            case .nearToFar:
+                return ($0.distance ?? .infinity) < ($1.distance ?? .infinity)
+            case .farToNear:
+                return ($0.distance ?? 0) > ($1.distance ?? 0)
+            case .alphabetical:
+                return $0.name < $1.name
+            }
+        }
+        
+        let favoriteIds = Set(favorites.map { $0.stationId })
+        let favs = stationsToSort.filter { favoriteIds.contains($0.id) }
+        let others = stationsToSort.filter { !favoriteIds.contains($0.id) }
+        
+        return showFavoritesOnly ? (favs, []) : (favs, others)
     }
 
     var body: some View {
@@ -56,11 +89,23 @@ struct ContentView: View {
                 }
             }
             .navigationTitle("EMT Stations")
-            .navigationBarItems(trailing: Button(action: {
-                showingInfo = true
-            }) {
-                Image(systemName: "info.circle")
-            })
+            .navigationBarItems(
+                leading: Menu {
+                    Picker("Sort Order", selection: $sortOrder) {
+                        Label("Nearest First", systemImage: "location").tag(SortOrder.nearToFar)
+                        Label("Farthest First", systemImage: "location.slash").tag(SortOrder.farToNear)
+                        Label("Alphabetical", systemImage: "textformat").tag(SortOrder.alphabetical)
+                    }
+                    Toggle("Show Favorites Only", isOn: $showFavoritesOnly)
+                } label: {
+                    Image(systemName: "line.3.horizontal.decrease.circle")
+                },
+                trailing: Button(action: {
+                    showingInfo = true
+                }) {
+                    Image(systemName: "info.circle")
+                }
+            )
             .searchable(text: $searchText, prompt: "Search by stop number or name")
             .task {
                 await fetchStations()
@@ -94,6 +139,19 @@ struct ContentView: View {
                     }
                 }
             }
+            .onAppear {
+                locationManager.requestLocation()
+            }
+        }
+        .alert("Location Access Required", isPresented: .constant(locationManager.permissionDenied)) {
+            Button("Open Settings") {
+                if let url = URL(string: UIApplication.openSettingsURLString) {
+                    UIApplication.shared.open(url)
+                }
+            }
+            Button("Cancel", role: .cancel) {}
+        } message: {
+            Text("Please enable location access in Settings to see nearby stations.")
         }
     }
 
