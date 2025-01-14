@@ -6,6 +6,7 @@ struct InfoView: View {
     @State private var showingCredentials = false
     @AppStorage("mapPosition") private var mapPosition = "top"
     @AppStorage("showBusDistances") var showBusDistances = true
+    @AppStorage("showUserLocation") var showUserLocation = false
     let apiStats: ApiCounter?
     var refreshCallback: (() -> Void)? = nil
     
@@ -33,6 +34,8 @@ struct InfoView: View {
                         Text("Hidden").tag("hidden")
                     }
                     .pickerStyle(MenuPickerStyle())
+                    
+                    Toggle("Show Your Location", isOn: $showUserLocation)
                     
                     Toggle("Show Bus Distances", isOn: $showBusDistances)
                     

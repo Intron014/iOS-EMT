@@ -28,6 +28,8 @@ struct StopDetailView: View {
     @State private var region: MKCoordinateRegion
     @AppStorage("mapPosition") private var mapPosition = "top"
     @AppStorage("showBusDistances") private var showBusDistances = true
+    @StateObject private var locationManager = LocationManager()
+    @AppStorage("showUserLocation") private var showUserLocation = false
     
     init(stopId: String, stationCoordinates: CLLocationCoordinate2D) {
         self.stopId = stopId
@@ -83,6 +85,10 @@ struct StopDetailView: View {
                     Marker(item.lineNumber ?? "Bus", systemImage: "bus.fill", coordinate: item.coordinate)
                         .tint(item.markerTintColor)
                 }
+            }
+            
+            if showUserLocation {
+                UserAnnotation()
             }
         }
         .frame(height: 200)
