@@ -4,12 +4,19 @@ import SwiftData
 class TokenManager {
     static let shared = TokenManager()
     private var currentToken: String?
-    private var currentApiStats: ApiCounter?
+    private var tokenExpiration: Date?
+    private var apiStats: ApiCounter?
+    private let userDefaults = UserDefaults.standard
     
-    private init() {}
+    private init() {
+        if let savedStats = userDefaults.data(forKey: "apiStats"),
+           let decoded = try? JSONDecoder().decode(ApiCounter.self, from: savedStats) {
+            self.apiStats = decoded
+        }
+    }
     
     func getApiStats() -> ApiCounter? {
-        return currentApiStats
+        return apiStats
     }
     
     func validateCredentials(clientId: String, passkey: String) async throws -> String {
@@ -31,14 +38,20 @@ class TokenManager {
         }
         
         // Store the API stats
-        currentApiStats = loginResponse.data.first?.apiCounter
+        apiStats = loginResponse.data.first?.apiCounter
+        
+        if let encoded = try? JSONEncoder().encode(loginResponse.data.first?.apiCounter) {
+            userDefaults.set(encoded, forKey: "apiStats")
+        }
         
         return token
     }
     
     func getToken(using credentials: Credentials) async throws -> String {
-        if let token = currentToken {
-            return token
+        if let currentToken = currentToken,
+           let expiration = tokenExpiration,
+           Date() < expiration {
+            return currentToken
         }
         
         let token = try await validateCredentials(
@@ -47,6 +60,7 @@ class TokenManager {
         )
         
         currentToken = token
+        tokenExpiration = Date().addingTimeInterval(3600) // 1 hour
         return token
     }
 }

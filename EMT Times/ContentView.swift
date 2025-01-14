@@ -122,6 +122,9 @@ struct ContentView: View {
             )
             .searchable(text: $searchText, placement: .automatic, prompt: "Search by stop number or name")
             .task {
+                if credentials.isEmpty {
+                    showingCredentialsSheet = true
+                }
                 // Load cached data first
                 if let cached = StationsCache.shared.cachedStations {
                     stations = cached
@@ -134,9 +137,6 @@ struct ContentView: View {
                     await fetchStations()
                     isRefreshing = false
                 }
-            }
-            .refreshable {
-                await fetchStations()
             }
             .alert("Error", isPresented: .constant(errorMessage != nil)) {
                 Button("OK") { errorMessage = nil }
@@ -193,6 +193,12 @@ struct ContentView: View {
 
     private func fetchStations() async {
         isLoading = true
+        guard !credentials.isEmpty else {
+            showingCredentialsSheet = true
+            isLoading = false
+            return
+        }
+        
         guard let credential = credentials.first else {
             errorMessage = "No API credentials found"
             isLoading = false
@@ -230,6 +236,11 @@ struct ContentView: View {
             let (stationsData, _) = try await URLSession.shared.data(for: stationsRequest)
             let stationsResponse = try JSONDecoder().decode(StationResponse.self, from: stationsData)
             stations = stationsResponse.data
+
+            
+            for station in stations {
+                print("Station ID: \(station.id), Name: \(station.name), Distance: \(station.distance ?? 0) meters")
+            }
             
             // Cache the new data
             StationsCache.shared.saveStations(stationsResponse.data)

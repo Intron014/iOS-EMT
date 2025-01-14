@@ -18,6 +18,11 @@ struct InfoView: View {
         return formatter.localizedString(for: lastUpdate, relativeTo: Date())
     }
     
+    private func refreshCache() {
+        StationsCache.shared.clearMemoryCache()
+        refreshCallback?()
+    }
+    
     var body: some View {
         NavigationView {
             List {
@@ -42,17 +47,27 @@ struct InfoView: View {
                     Link("GitHub: @intron014", destination: URL(string: "https://github.com/intron014")!)
                 }
                 
-                if let stats = apiStats {
-                    Section("API Statistics") {
+                Section("API Statistics") {
+                    if let stats = apiStats {
                         Text("Daily Uses: \(stats.dailyUse)")
                         Text("Current Uses: \(stats.current)")
                         Text("Last Cache Update: \(formattedLastUpdate())")
-                    }
-                    Section("License"){
-                        Text(stats.licenceUse)
+                            .swipeActions {
+                                Button(action: refreshCache) {
+                                    Label("Refresh", systemImage: "arrow.clockwise")
+                                }
+                                .tint(.green)
+                            }
+                    } else {
+                        Text("No API statistics available")
+                            .foregroundColor(.secondary)
                     }
                 }
-
+                if let stats = apiStats {
+                    Section("License"){
+                            Text(stats.licenceUse)
+                    }
+                }
                 
             }
             .navigationTitle("About")
