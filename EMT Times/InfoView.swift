@@ -37,7 +37,9 @@ struct InfoView: View {
                     Section("API Statistics") {
                         Text("Daily Uses: \(stats.dailyUse)")
                         Text("Current Uses: \(stats.current)")
-                        Text("License: \(stats.licenceUse)")
+                    }
+                    Section("License"){
+                        Text(stats.licenceUse)
                     }
                 }
             }

@@ -11,7 +11,6 @@ import SwiftData
 @main
 struct EMT_TimesApp: App {
     let modelContainer: ModelContainer
-    @State private var showingCredentials = false
     
     init() {
         do {
@@ -29,25 +28,7 @@ struct EMT_TimesApp: App {
     var body: some Scene {
         WindowGroup {
             ContentView()
-                .onAppear {
-                    checkCredentials()
-                }
-                .sheet(isPresented: $showingCredentials) {
-                    CredentialsView(isPresented: $showingCredentials)
-                }
         }
         .modelContainer(modelContainer)
-    }
-    
-    private func checkCredentials() {
-        let context = modelContainer.mainContext
-        let descriptor = FetchDescriptor<Credentials>()
-        
-        do {
-            let credentials = try context.fetch(descriptor)
-            showingCredentials = credentials.isEmpty
-        } catch {
-            showingCredentials = true
-        }
     }
 }

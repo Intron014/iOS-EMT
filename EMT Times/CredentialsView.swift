@@ -13,7 +13,7 @@ struct CredentialsView: View {
     
     private func obfuscateString(_ input: String) -> String {
         guard input.count > 4 else { return input }
-        return String(input.prefix(4)) + String(repeating: "•", count: input.count - 4)
+        return String(input.prefix(4)) + String(repeating: "•", count: 16)
     }
     
     var body: some View {

@@ -19,7 +19,6 @@ struct ContentView: View {
     @State private var errorMessage: String?
     @State private var stations: [Station] = []
     @Environment(\.modelContext) private var modelContext
-    @Query private var items: [Item]
     @State private var useMockData = false
     @State private var searchText = ""
     @State private var directStopId: String?
@@ -33,6 +32,7 @@ struct ContentView: View {
     @State private var sortOrder: SortOrder = .nearToFar
     @State private var showFavoritesOnly = false
     @State private var showingSortOptions = false
+    @State private var showingCredentialsSheet = false
 
     var sortedStations: ([Station], [Station]) {
         var stationsToSort = self.stations
@@ -97,6 +97,11 @@ struct ContentView: View {
                         Label("Alphabetical", systemImage: "textformat").tag(SortOrder.alphabetical)
                     }
                     Toggle("Show Favorites Only", isOn: $showFavoritesOnly)
+                    Button(action: {
+                        showingCredentialsSheet = true
+                    }) {
+                        Label("Configure API Credentials", systemImage: "key")
+                    }
                 } label: {
                     Image(systemName: "line.3.horizontal.decrease.circle")
                 },
@@ -138,6 +143,9 @@ struct ContentView: View {
                         await fetchStations()
                     }
                 }
+            }
+            .sheet(isPresented: $showingCredentialsSheet) {
+                CredentialsView(isPresented: $showingCredentialsSheet)
             }
             .onAppear {
                 locationManager.requestLocation()
