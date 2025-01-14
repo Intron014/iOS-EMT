@@ -33,6 +33,7 @@ struct ContentView: View {
     @State private var showFavoritesOnly = false
     @State private var showingSortOptions = false
     @State private var showingCredentialsSheet = false
+    @State private var isLoading = true  // Add this line
 
     var sortedStations: ([Station], [Station]) {
         var stationsToSort = self.stations
@@ -73,18 +74,25 @@ struct ContentView: View {
 
     var body: some View {
         NavigationView {
-            List {
-                if !sortedStations.0.isEmpty {
-                    Section("Favorites") {
-                        ForEach(sortedStations.0) { station in
-                            stationRow(for: station)
+            Group {
+                if isLoading {
+                    ProgressView()
+                } else {
+                    List {
+                        if !sortedStations.0.isEmpty {
+                            Section("Favorites") {
+                                ForEach(sortedStations.0) { station in
+                                    stationRow(for: station)
+                                }
+                            }
                         }
-                    }
-                }
-                
-                Section("All Stations") {
-                    ForEach(sortedStations.1) { station in
-                        stationRow(for: station)
+                        if(!showFavoritesOnly){
+                            Section("All Stations") {
+                                ForEach(sortedStations.1) { station in
+                                    stationRow(for: station)
+                                }
+                            }
+                        }
                     }
                 }
             }
@@ -96,7 +104,7 @@ struct ContentView: View {
                         Label("Farthest First", systemImage: "location.slash").tag(SortOrder.farToNear)
                         Label("Alphabetical", systemImage: "textformat").tag(SortOrder.alphabetical)
                     }
-                    Toggle("Show Favorites Only", isOn: $showFavoritesOnly)
+                    Toggle("Show Favorites Only", systemImage: "star", isOn: $showFavoritesOnly)
                     Button(action: {
                         showingCredentialsSheet = true
                     }) {
@@ -111,7 +119,7 @@ struct ContentView: View {
                     Image(systemName: "info.circle")
                 }
             )
-            .searchable(text: $searchText, prompt: "Search by stop number or name")
+            .searchable(text: $searchText, placement: .automatic, prompt: "Search by stop number or name")
             .task {
                 await fetchStations()
             }
@@ -218,8 +226,10 @@ struct ContentView: View {
     }
 
     private func fetchStations() async {
+        isLoading = true
         guard let credential = credentials.first else {
             errorMessage = "No API credentials found"
+            isLoading = false
             return
         }
         
@@ -227,14 +237,17 @@ struct ContentView: View {
             do {
                 guard let url = Bundle.main.url(forResource: "stationresponse", withExtension: "json") else {
                     errorMessage = "Mock data file not found"
+                    isLoading = false
                     return
                 }
                 let data = try Data(contentsOf: url)
                 let stationsResponse = try JSONDecoder().decode(StationResponse.self, from: data)
                 stations = stationsResponse.data
+                isLoading = false
             } catch {
                 errorMessage = error.localizedDescription
                 print("Mock data error: \(error)")
+                isLoading = false
             }
             return
         }
@@ -251,10 +264,12 @@ struct ContentView: View {
             let (stationsData, _) = try await URLSession.shared.data(for: stationsRequest)
             let stationsResponse = try JSONDecoder().decode(StationResponse.self, from: stationsData)
             stations = stationsResponse.data
+            isLoading = false
             
         } catch {
             errorMessage = error.localizedDescription
             print("Error details: \(error)")
+            isLoading = false
         }
     }
 }
