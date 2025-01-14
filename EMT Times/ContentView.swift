@@ -33,7 +33,8 @@ struct ContentView: View {
     @State private var showFavoritesOnly = false
     @State private var showingSortOptions = false
     @State private var showingCredentialsSheet = false
-    @State private var isLoading = true  // Add this line
+    @State private var isLoading = true
+    @State private var isRefreshing = false
 
     var sortedStations: ([Station], [Station]) {
         var stationsToSort = self.stations
@@ -121,6 +122,20 @@ struct ContentView: View {
             )
             .searchable(text: $searchText, placement: .automatic, prompt: "Search by stop number or name")
             .task {
+                // Load cached data first
+                if let cached = StationsCache.shared.cachedStations {
+                    stations = cached
+                    isLoading = false
+                }
+                
+                // Refresh in background if needed
+                if StationsCache.shared.shouldRefresh() {
+                    isRefreshing = true
+                    await fetchStations()
+                    isRefreshing = false
+                }
+            }
+            .refreshable {
                 await fetchStations()
             }
             .alert("Error", isPresented: .constant(errorMessage != nil)) {
@@ -215,12 +230,19 @@ struct ContentView: View {
             let (stationsData, _) = try await URLSession.shared.data(for: stationsRequest)
             let stationsResponse = try JSONDecoder().decode(StationResponse.self, from: stationsData)
             stations = stationsResponse.data
+            
+            // Cache the new data
+            StationsCache.shared.saveStations(stationsResponse.data)
             isLoading = false
             
         } catch {
             errorMessage = error.localizedDescription
             print("Error details: \(error)")
-            isLoading = false
+            if isLoading && StationsCache.shared.cachedStations != nil {
+                // If initial load fails but we have cache, use it
+                stations = StationsCache.shared.cachedStations!
+                isLoading = false
+            }
         }
     }
 }

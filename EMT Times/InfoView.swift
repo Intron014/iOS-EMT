@@ -9,6 +9,15 @@ struct InfoView: View {
     let apiStats: ApiCounter?
     var refreshCallback: (() -> Void)? = nil
     
+    private func formattedLastUpdate() -> String {
+        guard let lastUpdate = StationsCache.shared.lastUpdate else {
+            return "Never"
+        }
+        let formatter = RelativeDateTimeFormatter()
+        formatter.unitsStyle = .full
+        return formatter.localizedString(for: lastUpdate, relativeTo: Date())
+    }
+    
     var body: some View {
         NavigationView {
             List {
@@ -37,11 +46,14 @@ struct InfoView: View {
                     Section("API Statistics") {
                         Text("Daily Uses: \(stats.dailyUse)")
                         Text("Current Uses: \(stats.current)")
+                        Text("Last Cache Update: \(formattedLastUpdate())")
                     }
                     Section("License"){
                         Text(stats.licenceUse)
                     }
                 }
+
+                
             }
             .navigationTitle("About")
             .navigationBarItems(trailing: Button("Done") {
