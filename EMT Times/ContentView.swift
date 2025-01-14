@@ -173,56 +173,7 @@ struct ContentView: View {
 
     @ViewBuilder
     private func stationRow(for station: Station) -> some View {
-        NavigationLink(destination: StopDetailView(stopId: station.id,
-                                                  stationCoordinates: station.coordinates)) {
-            VStack(alignment: .leading) {
-                if let favorite = favorites.first(where: { $0.stationId == station.id }) {
-                    Text(favorite.customName ?? station.name)
-                        .font(.headline)
-                } else {
-                    Text(station.name)
-                        .font(.headline)
-                }
-                Text("Lines: \(station.lines.joined(separator: ", "))")
-                    .font(.subheadline)
-            }
-        }
-        .swipeActions(edge: .trailing) {
-            if let favorite = favorites.first(where: { $0.stationId == station.id }) {
-                Button {
-                    editingStation = favorite
-                    tempCustomName = favorite.customName ?? ""
-                    showingNameEditor = true
-                } label: {
-                    Label("Edit", systemImage: "pencil")
-                }
-                .tint(.blue)
-                
-                Button(role: .destructive) {
-                    removeFavorite(station)
-                } label: {
-                    Label("Unfavorite", systemImage: "star.slash")
-                }
-            } else {
-                Button {
-                    addFavorite(station)
-                } label: {
-                    Label("Favorite", systemImage: "star")
-                }
-                .tint(.yellow)
-            }
-        }
-    }
-
-    private func addFavorite(_ station: Station) {
-        let favorite = FavoriteStation(stationId: station.id, name: station.name)
-        modelContext.insert(favorite)
-    }
-
-    private func removeFavorite(_ station: Station) {
-        if let favorite = favorites.first(where: { $0.stationId == station.id }) {
-            modelContext.delete(favorite)
-        }
+        StationRowView(station: station)
     }
 
     private func fetchStations() async {
