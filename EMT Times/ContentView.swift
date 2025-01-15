@@ -19,13 +19,10 @@ struct ContentView: View {
     @State private var errorMessage: String?
     @State private var stations: [Station] = []
     @Environment(\.modelContext) private var modelContext
-    @State private var useMockData = false
     @State private var searchText = ""
     @State private var directStopId: String?
     @Query private var favorites: [FavoriteStation]
     @State private var editingStation: FavoriteStation?
-    @State private var showingNameEditor = false
-    @State private var tempCustomName = ""
     @State private var showingInfo = false
     @Query private var credentials: [Credentials]
     @StateObject private var locationManager = LocationManager()
@@ -35,6 +32,9 @@ struct ContentView: View {
     @State private var showingCredentialsSheet = false
     @State private var isLoading = true
     @State private var isRefreshing = false
+    @AppStorage("showDataSourceAlert") private var showDataSourceAlert = false
+    @State private var dataSource: String = ""
+    @State private var showingDataSourceAlert = false
 
     var sortedStations: ([Station], [Station]) {
         var stationsToSort = self.stations
@@ -129,6 +129,10 @@ struct ContentView: View {
                 if let cached = StationsCache.shared.cachedStations {
                     stations = cached
                     isLoading = false
+                    if showDataSourceAlert {
+                        dataSource = "Showing data from cache"
+                        showingDataSourceAlert = true
+                    }
                 }
                 
                 // Refresh in background if needed
@@ -142,23 +146,6 @@ struct ContentView: View {
                 Button("OK") { errorMessage = nil }
             } message: {
                 Text(errorMessage ?? "Unknown error")
-            }
-            .sheet(isPresented: $showingNameEditor) {
-                NavigationView {
-                    Form {
-                        TextField("Custom Name", text: $tempCustomName)
-                    }
-                    .navigationTitle("Edit Name")
-                    .navigationBarItems(
-                        leading: Button("Cancel") {
-                            showingNameEditor = false
-                        },
-                        trailing: Button("Save") {
-                            editingStation?.customName = tempCustomName.isEmpty ? nil : tempCustomName
-                            showingNameEditor = false
-                        }
-                    )
-                }
             }
             .sheet(isPresented: $showingInfo) {
                 InfoView(apiStats: TokenManager.shared.getApiStats()) {
@@ -184,6 +171,11 @@ struct ContentView: View {
         } message: {
             Text("Please enable location access in Settings to see nearby stations.")
         }
+        .alert("Data Source", isPresented: $showingDataSourceAlert) {
+            Button("OK", role: .cancel) { }
+        } message: {
+            Text(dataSource)
+        }
     }
 
     @ViewBuilder
@@ -204,25 +196,7 @@ struct ContentView: View {
             isLoading = false
             return
         }
-        
-        if useMockData {
-            do {
-                guard let url = Bundle.main.url(forResource: "stationresponse", withExtension: "json") else {
-                    errorMessage = "Mock data file not found"
-                    isLoading = false
-                    return
-                }
-                let data = try Data(contentsOf: url)
-                let stationsResponse = try JSONDecoder().decode(StationResponse.self, from: data)
-                stations = stationsResponse.data
-                isLoading = false
-            } catch {
-                errorMessage = error.localizedDescription
-                print("Mock data error: \(error)")
-                isLoading = false
-            }
-            return
-        }
+
         
         do {
             let token = try await TokenManager.shared.getToken(using: credential)
@@ -245,6 +219,10 @@ struct ContentView: View {
             // Cache the new data
             StationsCache.shared.saveStations(stationsResponse.data)
             isLoading = false
+            if showDataSourceAlert {
+                dataSource = "Data freshly downloaded from EMT servers"
+                showingDataSourceAlert = true
+            }
             
         } catch {
             errorMessage = error.localizedDescription
@@ -253,6 +231,10 @@ struct ContentView: View {
                 // If initial load fails but we have cache, use it
                 stations = StationsCache.shared.cachedStations!
                 isLoading = false
+                if showDataSourceAlert {
+                    dataSource = "Showing cached data (download failed due to: \(error.localizedDescription))"
+                    showingDataSourceAlert = true
+                }
             }
         }
     }

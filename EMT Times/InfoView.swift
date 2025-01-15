@@ -7,6 +7,7 @@ struct InfoView: View {
     @AppStorage("mapPosition") private var mapPosition = "top"
     @AppStorage("showBusDistances") var showBusDistances = true
     @AppStorage("showUserLocation") var showUserLocation = false
+    @AppStorage("showDataSourceAlert") var showDataSourceAlert = false
     let apiStats: ApiCounter?
     var refreshCallback: (() -> Void)? = nil
     
@@ -38,6 +39,8 @@ struct InfoView: View {
                     Toggle("Show Your Location", isOn: $showUserLocation)
                     
                     Toggle("Show Bus Distances", isOn: $showBusDistances)
+                    
+                    Toggle("Show Data Source Alerts", isOn: $showDataSourceAlert)
                     
                     Button("Manage API Credentials") {
                         showingCredentials = true

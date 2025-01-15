@@ -47,21 +47,38 @@ struct StationRowView: View {
             }
         }
         .sheet(isPresented: $showingNameEditor) {
-            NavigationView {
+            NavigationStack {
                 Form {
                     TextField("Custom Name", text: $tempCustomName)
+                        .submitLabel(.done)
+                        .onSubmit {
+                            favorite?.customName = tempCustomName.isEmpty ? nil : tempCustomName
+                            showingNameEditor = false
+                        }
                 }
-                .navigationTitle("Edit Name")
-                .navigationBarItems(
-                    leading: Button("Cancel") {
-                        showingNameEditor = false
-                    },
-                    trailing: Button("Save") {
-                        favorite?.customName = tempCustomName.isEmpty ? nil : tempCustomName
-                        showingNameEditor = false
+                .navigationTitle("Edit Namo")
+                .toolbar {
+                    ToolbarItem(placement: .cancellationAction) {
+                        Button("Cancel") {
+                            showingNameEditor = false
+                        }
                     }
-                )
+                    ToolbarItem(placement: .primaryAction) {
+                        Button("Save") {
+                            favorite?.customName = tempCustomName.isEmpty ? nil : tempCustomName
+                            showingNameEditor = false
+                        }
+                    }
+                    ToolbarItem(placement: .principal) {
+                        Button("Reset") {
+                            tempCustomName = station.name
+                        }
+                        .foregroundStyle(.orange)
+                    }
+                }
             }
+            .interactiveDismissDisabled()
+            .ignoresSafeArea(.keyboard)
         }
     }
 }
