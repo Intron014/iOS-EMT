@@ -110,11 +110,17 @@ struct ContentView: View {
             .navigationTitle("EMT Stations")
             .navigationBarItems(
                 leading: Menu {
-                    Picker("Sort Order", selection: $sortOrder) {
+                    if(mainView == "list"){
+                        Picker("Sort Order", selection: $sortOrder) {
                         Label("Nearest First", systemImage: "location").tag(SortOrder.nearToFar)
                         Label("Farthest First", systemImage: "location.slash").tag(SortOrder.farToNear)
                         Label("Alphabetical", systemImage: "textformat").tag(SortOrder.alphabetical)
-                    }
+                        }
+                    } 
+                    Picker("View Type", selection: $mainView) {
+                        Label("List View", systemImage: "list.bullet").tag("list")
+                        Label("Map View", systemImage: "map").tag("map")
+                    }.pickerStyle(MenuPickerStyle())
                     Toggle("Show Favorites Only", systemImage: "star", isOn: $showFavoritesOnly)
                     Button(action: {
                         showingCredentialsSheet = true
