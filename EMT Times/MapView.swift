@@ -19,10 +19,7 @@ struct MapView: View {
         self.showFavoritesOnly = showFavoritesOnly
         self.onStationSelected = onStationSelected
         
-        _position = State(initialValue: .region(MKCoordinateRegion(
-            center: CLLocationCoordinate2D(latitude: 40.4168, longitude: -3.7038),
-            span: MKCoordinateSpan(latitudeDelta: 0.02, longitudeDelta: 0.02)
-        )))
+        _position = State(initialValue: .userLocation(fallback: .automatic))
     }
     
     var visibleStations: [Station] {
@@ -97,10 +94,6 @@ struct MapView: View {
         }
         .task {
             if let location = await LocationManager.shared.requestLocation() {
-                position = .region(MKCoordinateRegion(
-                    center: location.coordinate,
-                    span: MKCoordinateSpan(latitudeDelta: 0.01, longitudeDelta: 0.01) 
-                ))
                 hasInitialLocation = true
             }
         }
