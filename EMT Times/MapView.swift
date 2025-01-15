@@ -4,6 +4,7 @@ import MapKit
 struct MapView: View {
     let stations: [Station]
     let favorites: Set<String>
+    let showFavoritesOnly: Bool
     var onStationSelected: (Station) -> Void
     @State private var selectedStation: Station?
     @State private var position: MapCameraPosition
@@ -12,9 +13,10 @@ struct MapView: View {
     @State private var selectedStopId: String?
     @State private var selectedCoordinates: CLLocationCoordinate2D?
     
-    init(stations: [Station], favorites: Set<String>, onStationSelected: @escaping (Station) -> Void) {
+    init(stations: [Station], favorites: Set<String>, showFavoritesOnly: Bool = false, onStationSelected: @escaping (Station) -> Void) {
         self.stations = stations
         self.favorites = favorites
+        self.showFavoritesOnly = showFavoritesOnly
         self.onStationSelected = onStationSelected
         
         _position = State(initialValue: .region(MKCoordinateRegion(
@@ -25,9 +27,10 @@ struct MapView: View {
     
     var visibleStations: [Station] {
         guard let region = visibleRegion, hasInitialLocation else { return [] }
-        return stations.filter { station in
+        let filtered = stations.filter { station in
             region.contains(coordinate: station.coordinates)
         }
+        return showFavoritesOnly ? filtered.filter { favorites.contains($0.id) } : filtered
     }
 
     private var stationBinding: Binding<Station?> {

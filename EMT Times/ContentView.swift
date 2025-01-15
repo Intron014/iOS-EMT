@@ -99,7 +99,8 @@ struct ContentView: View {
                     } else {
                         MapView(
                             stations: stations,
-                            favorites: Set(favorites.map { $0.stationId })
+                            favorites: Set(favorites.map { $0.stationId }),
+                            showFavoritesOnly: showFavoritesOnly
                         ) { _ in
                         
                         }
@@ -249,6 +250,3 @@ struct ContentView: View {
     }
 }
 
-#Preview {
-    ContentView()
-}
