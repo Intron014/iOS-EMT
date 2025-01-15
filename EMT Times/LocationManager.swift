@@ -1,6 +1,7 @@
 import CoreLocation
 
 class LocationManager: NSObject, ObservableObject, CLLocationManagerDelegate {
+    static let shared = LocationManager()
     private let locationManager = CLLocationManager()
     @Published var location: CLLocation?
     @Published var authorizationStatus: CLAuthorizationStatus?
@@ -64,6 +65,19 @@ class LocationManager: NSObject, ObservableObject, CLLocationManagerDelegate {
             manager.requestWhenInUseAuthorization()
         @unknown default:
             break
+        }
+    }
+    
+    func requestLocation() async -> CLLocation? {
+        return await withCheckedContinuation { continuation in
+            if let location = self.location {
+                continuation.resume(returning: location)
+            } else {
+                self.locationManager.requestLocation()
+                DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
+                    continuation.resume(returning: self.location)
+                }
+            }
         }
     }
 }

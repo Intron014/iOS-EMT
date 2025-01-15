@@ -33,7 +33,7 @@ struct ApiCounter: Codable {
     let licenceUse: String
 }
 
-class Station: Codable, Identifiable {
+struct Station: Identifiable, Codable, Hashable, Equatable {
     let id: String
     let name: String
     let coordinates: CLLocationCoordinate2D
@@ -53,7 +53,7 @@ class Station: Codable, Identifiable {
         case coordinates
     }
     
-    required init(from decoder: Decoder) throws {
+    init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
         id = try container.decode(String.self, forKey: .id)
         name = try container.decode(String.self, forKey: .name)
@@ -74,6 +74,14 @@ class Station: Codable, Identifiable {
         
         var geometryContainer = container.nestedContainer(keyedBy: GeometryKeys.self, forKey: .geometry)
         try geometryContainer.encode([coordinates.longitude, coordinates.latitude], forKey: .coordinates)
+    }
+    
+    func hash(into hasher: inout Hasher) {
+        hasher.combine(id)
+    }
+    
+    static func == (lhs: Station, rhs: Station) -> Bool {
+        return lhs.id == rhs.id
     }
 }
 

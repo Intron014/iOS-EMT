@@ -5,6 +5,7 @@ struct InfoView: View {
     @Environment(\.dismiss) var dismiss
     @State private var showingCredentials = false
     @AppStorage("mapPosition") private var mapPosition = "top"
+    @AppStorage("mainView") private var mainView = "list"
     @AppStorage("showBusDistances") var showBusDistances = true
     @AppStorage("showUserLocation") var showUserLocation = false
     @AppStorage("showDataSourceAlert") var showDataSourceAlert = false
@@ -33,6 +34,12 @@ struct InfoView: View {
                         Text("Top").tag("top")
                         Text("Below").tag("below")
                         Text("Hidden").tag("hidden")
+                    }
+                    .pickerStyle(MenuPickerStyle())
+
+                    Picker("Default View", selection: $mainView) {
+                        Label("List View", systemImage: "list.bullet").tag("list")
+                        Label("Map View", systemImage: "map").tag("map")
                     }
                     .pickerStyle(MenuPickerStyle())
                     

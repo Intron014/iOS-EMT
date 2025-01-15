@@ -35,23 +35,23 @@ struct ContentView: View {
     @AppStorage("showDataSourceAlert") private var showDataSourceAlert = false
     @State private var dataSource: String = ""
     @State private var showingDataSourceAlert = false
+    @AppStorage("mainView") private var mainView = "list"
 
     var sortedStations: ([Station], [Station]) {
-        var stationsToSort = self.stations
+        var stationsToSort = self.stations.map { station -> Station in
+            var mutableStation = station
+            if let userLocation = locationManager.location {
+                let stationLocation = CLLocation(latitude: station.coordinates.latitude,
+                                               longitude: station.coordinates.longitude)
+                mutableStation.distance = userLocation.distance(from: stationLocation)
+            }
+            return mutableStation
+        }
         
         // Filter by search text
         if !searchText.isEmpty {
             stationsToSort = stationsToSort.filter { $0.id.contains(searchText) || 
                                                    $0.name.localizedCaseInsensitiveContains(searchText) }
-        }
-        
-        // Update distances
-        if let userLocation = locationManager.location {
-            for station in stationsToSort {
-                let stationLocation = CLLocation(latitude: station.coordinates.latitude,
-                                               longitude: station.coordinates.longitude)
-                station.distance = userLocation.distance(from: stationLocation)
-            }
         }
         
         // Sort stations
@@ -79,20 +79,29 @@ struct ContentView: View {
                 if isLoading {
                     ProgressView()
                 } else {
-                    List {
-                        if !sortedStations.0.isEmpty {
-                            Section("Favorites") {
-                                ForEach(sortedStations.0) { station in
-                                    stationRow(for: station)
+                    if mainView == "list" {
+                        List {
+                            if !sortedStations.0.isEmpty {
+                                Section("Favorites") {
+                                    ForEach(sortedStations.0) { station in
+                                        stationRow(for: station)
+                                    }
+                                }
+                            }
+                            if(!showFavoritesOnly){
+                                Section("All Stations") {
+                                    ForEach(sortedStations.1) { station in
+                                        stationRow(for: station)
+                                    }
                                 }
                             }
                         }
-                        if(!showFavoritesOnly){
-                            Section("All Stations") {
-                                ForEach(sortedStations.1) { station in
-                                    stationRow(for: station)
-                                }
-                            }
+                    } else {
+                        MapView(
+                            stations: stations,
+                            favorites: Set(favorites.map { $0.stationId })
+                        ) { _ in
+                        
                         }
                     }
                 }
