@@ -25,6 +25,8 @@ struct StopDetailView: View {
     @State private var isLoading = true
     @State private var timer: Timer?
     @Query private var credentials: [Credentials]
+    @Query private var favorites: [FavoriteStation]
+    @Environment(\.modelContext) private var modelContext
     @State private var region: MKCoordinateRegion
     @AppStorage("mapPosition") private var mapPosition = "top"
     @AppStorage("showBusDistances") private var showBusDistances = true
@@ -95,6 +97,23 @@ struct StopDetailView: View {
         .cornerRadius(10)
         .padding()
     }
+
+    private var isFavorite: Bool {
+        favorites.contains { $0.stationId == stopId }
+    }
+
+    private func toggleFavorite() {
+        if isFavorite {
+            if let favorite = favorites.first(where: { $0.stationId == stopId }) {
+                modelContext.delete(favorite)
+            }
+        } else {
+            if let stopName = arrivalData?.StopInfo.first?.stopName {
+                let favorite = FavoriteStation(stationId: stopId, name: stopName)
+                modelContext.insert(favorite)
+            }
+        }
+    }
     
     var body: some View {
         VStack {
@@ -164,6 +183,9 @@ struct StopDetailView: View {
                 mapView
             }
         }
+        .navigationBarItems(trailing: Button(action: toggleFavorite) {
+            Image(systemName: isFavorite ? "star.fill" : "star")
+        })
     }
     
     private func fetchArrivals() async {
