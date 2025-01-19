@@ -102,6 +102,9 @@ struct InfoView: View {
                                 .onTapGesture {
                                     showingFullSizeIcon = "DupAppIcon"
                                 }
+                            Text("By Carmen")
+                                .font(.caption)
+                                .foregroundColor(.secondary)
                         }
                         Spacer()
                         VStack {
@@ -112,6 +115,9 @@ struct InfoView: View {
                                 .onTapGesture {
                                     showingFullSizeIcon = "FavIcon"
                                 }
+                            Text("By Marta")
+                                .font(.caption)
+                                .foregroundColor(.secondary)
                         }
                         Spacer()
                     }
