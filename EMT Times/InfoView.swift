@@ -11,6 +11,7 @@ struct InfoView: View {
     @AppStorage("showDataSourceAlert") var showDataSourceAlert = false
     let apiStats: ApiCounter?
     var refreshCallback: (() -> Void)? = nil
+    @State private var showingFullSizeIcon: String?
     
     private func formattedLastUpdate() -> String {
         guard let lastUpdate = StationsCache.shared.lastUpdate else {
@@ -24,6 +25,14 @@ struct InfoView: View {
     private func refreshCache() {
         StationsCache.shared.clearMemoryCache()
         refreshCallback?()
+    }
+    
+    private func changeAppIcon(to iconName: String?) {
+        UIApplication.shared.setAlternateIconName(iconName) { error in
+            if let error = error {
+                print("Error changing app icon: \(error.localizedDescription)")
+            }
+        }
     }
     
     var body: some View {
@@ -82,11 +91,52 @@ struct InfoView: View {
                     }
                 }
                 
+                Section("App Icons") {
+                    HStack {
+                        Spacer()
+                        VStack {
+                            Image("DupAppIcon")
+                                .resizable()
+                                .frame(width: 60, height: 60)
+                                .cornerRadius(10)
+                                .onTapGesture {
+                                    showingFullSizeIcon = "DupAppIcon"
+                                }
+                        }
+                        Spacer()
+                        VStack {
+                            Image("FavIcon")
+                                .resizable()
+                                .frame(width: 60, height: 60)
+                                .cornerRadius(10)
+                                .onTapGesture {
+                                    showingFullSizeIcon = "FavIcon"
+                                }
+                        }
+                        Spacer()
+                    }
+                }
             }
             .navigationTitle("About")
             .navigationBarItems(trailing: Button("Done") {
                 dismiss()
             })
+            .sheet(isPresented: Binding<Bool>(
+                get: { showingFullSizeIcon != nil },
+                set: { if !$0 { showingFullSizeIcon = nil } }
+            )) {
+                if let iconName = showingFullSizeIcon {
+                    VStack {
+                        Image(iconName)
+                            .resizable()
+                            .scaledToFit()
+                            .padding()
+                        Button("Close") {
+                            showingFullSizeIcon = nil
+                        }
+                    }
+                }
+            }
             .sheet(isPresented: $showingCredentials) {
                 CredentialsView(isPresented: $showingCredentials, refreshCallback: refreshCallback)
             }
