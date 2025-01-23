@@ -12,12 +12,18 @@ struct StationRowView: View {
         favorites.first(where: { $0.stationId == station.id })
     }
     
+    private var formattedLines: String {
+        station.lines
+            .map { $0.split(separator: "/").first?.description ?? $0 }
+            .joined(separator: ", ")
+    }
+    
     var body: some View {
         NavigationLink(destination: StopDetailView(stopId: station.id, stationCoordinates: station.coordinates)) {
             VStack(alignment: .leading) {
                 Text(favorite?.customName ?? station.name)
                     .font(.headline)
-                Text("Lines: \(station.lines.joined(separator: ", "))")
+                Text("Lines: \(formattedLines)")
                     .font(.subheadline)
             }
         }
