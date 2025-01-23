@@ -127,8 +127,15 @@ struct StopDetailView: View {
                     List {
                         if let stopInfo = data.StopInfo.first {
                             Section("Stop Information") {
-                                Text("Name: \(stopInfo.stopName)")
-                                Text("Address: \(stopInfo.Direction)")
+                                Text(stopInfo.stopName)
+                                Text(stopInfo.Direction)
+                                ScrollView(.horizontal, showsIndicators: false) {
+                                    HStack(spacing: 4) {
+                                        ForEach(stopInfo.lines, id: \.line) { line in
+                                            LineNumberView(number: line.line)
+                                        }
+                                    }
+                                }
                             }
                         }
                         
@@ -136,8 +143,7 @@ struct StopDetailView: View {
                             ForEach(data.Arrive) { arrival in
                                 VStack(alignment: .leading) {
                                     HStack {
-                                        Text("Line \(arrival.line)")
-                                            .font(.headline)
+                                        LineNumberView(number: arrival.line)
                                         Spacer()
                                         Text(formatArrivalTime(arrival.estimateArrive))
                                             .foregroundColor(.secondary)

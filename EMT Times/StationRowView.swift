@@ -4,12 +4,16 @@ import SwiftData
 struct LineNumberView: View {
     let number: String
     
+    private var isSpecialLine: Bool {
+        number.hasPrefix("5") && number.count == 3
+    }
+    
     var body: some View {
         Text(number)
             .padding(.horizontal, 6)
             .padding(.vertical, 2)
-            .background(number.hasPrefix("5") ? Color.black : Color.blue)
-            .foregroundStyle(number.hasPrefix("5") ? .yellow : .white)
+            .background(isSpecialLine ? Color.black : Color.blue)
+            .foregroundStyle(isSpecialLine ? .yellow : .white)
             .cornerRadius(4)
     }
 }
