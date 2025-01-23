@@ -1,6 +1,19 @@
 import SwiftUI
 import SwiftData
 
+struct LineNumberView: View {
+    let number: String
+    
+    var body: some View {
+        Text(number)
+            .padding(.horizontal, 6)
+            .padding(.vertical, 2)
+            .background(number.hasPrefix("5") ? Color.black : Color.blue)
+            .foregroundStyle(number.hasPrefix("5") ? .yellow : .white)
+            .cornerRadius(4)
+    }
+}
+
 struct StationRowView: View {
     let station: Station
     @Query private var favorites: [FavoriteStation]
@@ -12,10 +25,9 @@ struct StationRowView: View {
         favorites.first(where: { $0.stationId == station.id })
     }
     
-    private var formattedLines: String {
+    private var formattedLines: [String] {
         station.lines
             .map { $0.split(separator: "/").first?.description ?? $0 }
-            .joined(separator: ", ")
     }
     
     var body: some View {
@@ -23,8 +35,15 @@ struct StationRowView: View {
             VStack(alignment: .leading) {
                 Text(favorite?.customName ?? station.name)
                     .font(.headline)
-                Text("Lines: \(formattedLines)")
-                    .font(.subheadline)
+                HStack {
+                    ScrollView(.horizontal, showsIndicators: false) {
+                        HStack(spacing: 4) {
+                            ForEach(formattedLines, id: \.self) { line in
+                                LineNumberView(number: line)
+                            }
+                        }
+                    }
+                }
             }
         }
         .swipeActions(edge: .trailing) {
