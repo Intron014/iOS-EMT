@@ -69,8 +69,9 @@ class LocationManager: NSObject, ObservableObject, CLLocationManagerDelegate {
     }
     
     func requestLocation() async -> CLLocation? {
-        return await withCheckedContinuation { continuation in
-            if let location = self.location {
+        return await withCheckedContinuation { @Sendable continuation in
+            let location = self.location
+            if let location = location {
                 continuation.resume(returning: location)
             } else {
                 self.locationManager.requestLocation()
