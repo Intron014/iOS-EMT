@@ -125,7 +125,7 @@ struct StopDetailView: View {
         Map(position: Binding(
             get: { mapCamera },
             set: { mapCamera = $0 }
-        )) {
+        ), interactionModes: .all) {
             ForEach(filteredMapItems) { item in
                 if item.type == .station {
                     Marker("Stop", coordinate: item.coordinate)
@@ -140,8 +140,12 @@ struct StopDetailView: View {
                 UserAnnotation()
             }
         }
-        .onChange(of: filteredMapItems) { _, items in
-            mapCamera = .region(calculateRegion(for: items))
+        .onChange(of: filteredMapItems) { oldItems, newItems in
+            if oldItems.count != newItems.count {
+                withAnimation(.smooth(duration: 0.5)) {
+                    mapCamera = .region(calculateRegion(for: newItems))
+                }
+            }
         }
         .frame(height: 200)
         .cornerRadius(10)
