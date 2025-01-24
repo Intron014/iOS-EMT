@@ -50,7 +50,7 @@ struct StopDetailView: View {
             return ">90'"
         default:
             if seconds < 60 {
-                return "\(seconds)''"
+                return ">>"
             } else {
                 let minutes = seconds / 60
                 let remainingSeconds = seconds % 60
@@ -131,8 +131,8 @@ struct StopDetailView: View {
                                 Text(stopInfo.Direction)
                                 ScrollView(.horizontal, showsIndicators: false) {
                                     HStack(spacing: 4) {
-                                        ForEach(stopInfo.lines, id: \.line) { line in
-                                            LineNumberView(number: line.line)
+                                        ForEach(Array(Set(data.Arrive.map { $0.line })).sorted(), id: \.self) { line in
+                                            LineNumberView(number: line)
                                         }
                                     }
                                 }
