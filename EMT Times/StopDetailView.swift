@@ -136,12 +136,8 @@ struct StopDetailView: View {
                                     HStack(spacing: 4) {
                                         ForEach(Array(Set(data.Arrive.map { $0.line })).sorted(), id: \.self) { line in
                                             LineNumberView(number: line)
+                                                .opacity(selectedLines.isEmpty || selectedLines.contains(line) ? 1.0 : 0.3)
                                                 .padding(4)
-                                                .background(
-                                                    RoundedRectangle(cornerRadius: 8)
-                                                        .stroke(selectedLines.contains(line) ? Color.yellow : Color.clear, 
-                                                               lineWidth: 2)
-                                                )
                                                 .onTapGesture {
                                                     if selectedLines.contains(line) {
                                                         selectedLines.remove(line)
