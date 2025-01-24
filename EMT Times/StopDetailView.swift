@@ -2,7 +2,7 @@ import SwiftUI
 import SwiftData
 import MapKit
 
-struct CoordinateItem: Identifiable {
+struct CoordinateItem: Identifiable, Equatable {
     enum CoordinateType {
         case station
         case bus
@@ -14,6 +14,14 @@ struct CoordinateItem: Identifiable {
     
     var markerTintColor: Color {
         type == .station ? .red : .blue
+    }
+
+    static func == (lhs: CoordinateItem, rhs: CoordinateItem) -> Bool {
+        lhs.id == rhs.id &&
+        lhs.coordinate.latitude == rhs.coordinate.latitude &&
+        lhs.coordinate.longitude == rhs.coordinate.longitude &&
+        lhs.type == rhs.type &&
+        lhs.lineNumber == rhs.lineNumber
     }
 }
 
@@ -27,20 +35,20 @@ struct StopDetailView: View {
     @Query private var credentials: [Credentials]
     @Query private var favorites: [FavoriteStation]
     @Environment(\.modelContext) private var modelContext
-    @State private var region: MKCoordinateRegion
     @AppStorage("mapPosition") private var mapPosition = "top"
     @AppStorage("showBusDistances") private var showBusDistances = true
     @StateObject private var locationManager = LocationManager()
     @AppStorage("showUserLocation") private var showUserLocation = false
     @State private var selectedLines: Set<String> = []
-    
+    @State private var mapCamera: MapCameraPosition
+
     init(stopId: String, stationCoordinates: CLLocationCoordinate2D) {
         self.stopId = stopId
         self.stationCoordinates = stationCoordinates
-        self._region = State(initialValue: MKCoordinateRegion(
+        self._mapCamera = State(initialValue: .region(MKCoordinateRegion(
             center: stationCoordinates,
             span: MKCoordinateSpan(latitudeDelta: 0.005, longitudeDelta: 0.005)
-        ))
+        )))
     }
     
     private func formatArrivalTime(_ seconds: Int) -> String {
@@ -80,8 +88,44 @@ struct StopDetailView: View {
         return items
     }
 
+    private func calculateRegion(for items: [CoordinateItem]) -> MKCoordinateRegion {
+        guard !items.isEmpty else {
+            return MKCoordinateRegion(
+                center: stationCoordinates,
+                span: MKCoordinateSpan(latitudeDelta: 0.005, longitudeDelta: 0.005)
+            )
+        }
+
+        var minLat = items[0].coordinate.latitude
+        var maxLat = items[0].coordinate.latitude
+        var minLon = items[0].coordinate.longitude
+        var maxLon = items[0].coordinate.longitude
+
+        for item in items {
+            minLat = min(minLat, item.coordinate.latitude)
+            maxLat = max(maxLat, item.coordinate.latitude)
+            minLon = min(minLon, item.coordinate.longitude)
+            maxLon = max(maxLon, item.coordinate.longitude)
+        }
+
+        let center = CLLocationCoordinate2D(
+            latitude: (minLat + maxLat) / 2,
+            longitude: (minLon + maxLon) / 2
+        )
+
+        let span = MKCoordinateSpan(
+            latitudeDelta: (maxLat - minLat) * 1.5,
+            longitudeDelta: (maxLon - minLon) * 1.5
+        )
+
+        return MKCoordinateRegion(center: center, span: span)
+    }
+
     private var mapView: some View {
-        Map {
+        Map(position: Binding(
+            get: { mapCamera },
+            set: { mapCamera = $0 }
+        )) {
             ForEach(filteredMapItems) { item in
                 if item.type == .station {
                     Marker("Stop", coordinate: item.coordinate)
@@ -95,6 +139,9 @@ struct StopDetailView: View {
             if showUserLocation {
                 UserAnnotation()
             }
+        }
+        .onChange(of: filteredMapItems) { _, items in
+            mapCamera = .region(calculateRegion(for: items))
         }
         .frame(height: 200)
         .cornerRadius(10)
