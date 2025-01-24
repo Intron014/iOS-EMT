@@ -32,6 +32,7 @@ struct StopDetailView: View {
     @AppStorage("showBusDistances") private var showBusDistances = true
     @StateObject private var locationManager = LocationManager()
     @AppStorage("showUserLocation") private var showUserLocation = false
+    @State private var selectedLines: Set<String> = []
     
     init(stopId: String, stationCoordinates: CLLocationCoordinate2D) {
         self.stopId = stopId
@@ -63,15 +64,17 @@ struct StopDetailView: View {
         }
     }
     
-    private var mapItems: [CoordinateItem] {
+    private var filteredMapItems: [CoordinateItem] {
         var items = [
             CoordinateItem(coordinate: stationCoordinates, type: .station, lineNumber: nil)
         ]
         if let data = arrivalData {
             for arrival in data.Arrive {
-                let coords = arrival.geometry.coordinates
-                let busCoords = CLLocationCoordinate2D(latitude: coords[1], longitude: coords[0])
-                items.append(CoordinateItem(coordinate: busCoords, type: .bus, lineNumber: arrival.line))
+                if selectedLines.isEmpty || selectedLines.contains(arrival.line) {
+                    let coords = arrival.geometry.coordinates
+                    let busCoords = CLLocationCoordinate2D(latitude: coords[1], longitude: coords[0])
+                    items.append(CoordinateItem(coordinate: busCoords, type: .bus, lineNumber: arrival.line))
+                }
             }
         }
         return items
@@ -79,7 +82,7 @@ struct StopDetailView: View {
 
     private var mapView: some View {
         Map {
-            ForEach(mapItems) { item in
+            ForEach(filteredMapItems) { item in
                 if item.type == .station {
                     Marker("Stop", coordinate: item.coordinate)
                         .tint(item.markerTintColor)
@@ -133,6 +136,19 @@ struct StopDetailView: View {
                                     HStack(spacing: 4) {
                                         ForEach(Array(Set(data.Arrive.map { $0.line })).sorted(), id: \.self) { line in
                                             LineNumberView(number: line)
+                                                .padding(4)
+                                                .background(
+                                                    RoundedRectangle(cornerRadius: 8)
+                                                        .stroke(selectedLines.contains(line) ? Color.yellow : Color.clear, 
+                                                               lineWidth: 2)
+                                                )
+                                                .onTapGesture {
+                                                    if selectedLines.contains(line) {
+                                                        selectedLines.remove(line)
+                                                    } else {
+                                                        selectedLines.insert(line)
+                                                    }
+                                                }
                                         }
                                     }
                                 }
@@ -140,7 +156,7 @@ struct StopDetailView: View {
                         }
                         
                         Section("Arriving Buses") {
-                            ForEach(data.Arrive) { arrival in
+                            ForEach(data.Arrive.filter { selectedLines.isEmpty || selectedLines.contains($0.line) }) { arrival in
                                 VStack(alignment: .leading) {
                                     HStack {
                                         LineNumberView(number: arrival.line)
@@ -189,9 +205,15 @@ struct StopDetailView: View {
                 mapView
             }
         }
-        .navigationBarItems(trailing: Button(action: toggleFavorite) {
-            Image(systemName: isFavorite ? "star.fill" : "star")
-        })
+        .navigationBarItems(
+            leading: Button(action: { selectedLines.removeAll() }) {
+                Text("Clear Filters")
+                    .opacity(selectedLines.isEmpty ? 0 : 1)
+            },
+            trailing: Button(action: toggleFavorite) {
+                Image(systemName: isFavorite ? "star.fill" : "star")
+            }
+        )
     }
     
     private func fetchArrivals() async {
