@@ -5,7 +5,7 @@ struct LineNumberView: View {
     let number: String
     
     private var isSpecialLine: Bool {
-        number.hasPrefix("5") && number.count == 3
+        (number.hasPrefix("5") && number.count == 3) || number.hasPrefix("N")
     }
     
     var body: some View {

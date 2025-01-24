@@ -13,8 +13,15 @@ struct CoordinateItem: Identifiable, Equatable {
     let lineNumber: String?
     
     var markerTintColor: Color {
-        type == .station ? .red : .blue
+        if type == .station {
+            return .red
+        } else if let number = lineNumber {
+            return (number.hasPrefix("5") && number.count == 3) || number.hasPrefix("N") ? .yellow : .blue
+        } else {
+            return .blue
+        }
     }
+    
 
     static func == (lhs: CoordinateItem, rhs: CoordinateItem) -> Bool {
         lhs.id == rhs.id &&
