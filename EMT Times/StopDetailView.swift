@@ -48,6 +48,7 @@ struct StopDetailView: View {
     @AppStorage("showUserLocation") private var showUserLocation = false
     @State private var selectedLines: Set<String> = []
     @State private var mapCamera: MapCameraPosition
+    @State private var stopDetails: StopDetailData?
 
     init(stopId: String, stationCoordinates: CLLocationCoordinate2D) {
         self.stopId = stopId
@@ -190,19 +191,21 @@ struct StopDetailView: View {
                             Section("Stop Information") {
                                 Text(stopInfo.stopName)
                                 Text(stopInfo.Direction)
-                                ScrollView(.horizontal, showsIndicators: false) {
-                                    HStack(spacing: 4) {
-                                        ForEach(Array(Set(data.Arrive.map { $0.line })).sorted(), id: \.self) { line in
-                                            LineNumberView(number: line)
-                                                .opacity(selectedLines.isEmpty || selectedLines.contains(line) ? 1.0 : 0.3)
-                                                .padding(4)
-                                                .onTapGesture {
-                                                    if selectedLines.contains(line) {
-                                                        selectedLines.remove(line)
-                                                    } else {
-                                                        selectedLines.insert(line)
+                                if(!data.Arrive.isEmpty){
+                                    ScrollView(.horizontal, showsIndicators: false) {
+                                        HStack(spacing: 4) {
+                                            ForEach(Array(Set(data.Arrive.map { $0.line })).sorted(), id: \.self) { line in
+                                                LineNumberView(number: line)
+                                                    .opacity(selectedLines.isEmpty || selectedLines.contains(line) ? 1.0 : 0.3)
+                                                    .padding(4)
+                                                    .onTapGesture {
+                                                        if selectedLines.contains(line) {
+                                                            selectedLines.remove(line)
+                                                        } else {
+                                                            selectedLines.insert(line)
+                                                        }
                                                     }
-                                                }
+                                            }
                                         }
                                     }
                                 }
@@ -210,21 +213,45 @@ struct StopDetailView: View {
                         }
                         
                         Section("Arriving Buses") {
-                            ForEach(data.Arrive.filter { selectedLines.isEmpty || selectedLines.contains($0.line) }) { arrival in
+                            if data.Arrive.isEmpty {
                                 VStack(alignment: .leading) {
-                                    HStack {
-                                        LineNumberView(number: arrival.line)
-                                        Spacer()
-                                        Text(formatArrivalTime(arrival.estimateArrive))
-                                            .foregroundColor(.secondary)
-                                    }
-                                    Text("To: \(arrival.destination)")
-                                    if showBusDistances {
-                                        Text("Distance: \(arrival.DistanceBus)m")
-                                            .font(.caption)
+                                    Text("No buses currently arriving")
+                                        .foregroundColor(.secondary)
+                                    if let details = stopDetails?.stops.first {
+                                        ForEach(details.dataLine, id: \.line) { line in
+                                            VStack(alignment: .leading, spacing: 4) {
+                                                HStack {
+                                                    LineNumberView(number: line.line)
+                                                    Text("to \(line.headerB)")
+                                                }
+                                                Text("First bus: \(line.startTime)")
+                                                Text("Frequency: \(line.minFreq) - \(line.maxFreq) min")
+                                                Text("Schedule: \(line.stopTime)")
+                                                    .font(.caption)
+                                                    .foregroundColor(.secondary)
+                                            }
+                                            .padding(.vertical, 4)
+                                            Divider()
+                                        }
                                     }
                                 }
-                                .padding(.vertical, 4)
+                            } else {
+                                ForEach(data.Arrive.filter { selectedLines.isEmpty || selectedLines.contains($0.line) }) { arrival in
+                                    VStack(alignment: .leading) {
+                                        HStack {
+                                            LineNumberView(number: arrival.line)
+                                            Spacer()
+                                            Text(formatArrivalTime(arrival.estimateArrive))
+                                                .foregroundColor(.secondary)
+                                        }
+                                        Text("To: \(arrival.destination)")
+                                        if showBusDistances {
+                                            Text("Distance: \(arrival.DistanceBus)m")
+                                                .font(.caption)
+                                        }
+                                    }
+                                    .padding(.vertical, 4)
+                                }
                             }
                         }
                     }
@@ -233,6 +260,7 @@ struct StopDetailView: View {
             .navigationTitle(arrivalData?.StopInfo.first?.stopName ?? "Stop Details")
             .task {
                 await fetchArrivals()
+                await fetchStopDetails()
             }
             .alert("Error", isPresented: .constant(errorMessage != nil)) {
                 Button("OK") { errorMessage = nil }
@@ -308,4 +336,23 @@ struct StopDetailView: View {
         }
     }
 
+    private func fetchStopDetails() async {
+        guard let credential = credentials.first else { return }
+        
+        do {
+            let token = try await TokenManager.shared.getToken(using: credential)
+            
+            let url = URL(string: "https://openapi.emtmadrid.es/v2/transport/busemtmad/stops/\(stopId)/detail/")!
+            var request = URLRequest(url: url)
+            request.httpMethod = "GET"
+            request.addValue("\(token)", forHTTPHeaderField: "accessToken")
+            
+            let (data, _) = try await URLSession.shared.data(for: request)
+            let response = try JSONDecoder().decode(StopDetailResponse.self, from: data)
+            stopDetails = response.data.first
+            
+        } catch {
+            print("Error fetching stop details: \(error)")
+        }
+    }
 }
