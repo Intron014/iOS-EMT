@@ -44,10 +44,6 @@ struct InfoView: View {
         refreshCallback?()
     }
     
-    private func busColor(for line: String) -> Color {
-        return (line.hasPrefix("5") && line.count == 3) ? .black : .blue
-    }
-    
     var body: some View {
         NavigationView {
             List {
@@ -212,13 +208,7 @@ struct InfoView: View {
                                 ForEach(lines, id: \.line) { line in
                                     VStack(alignment: .leading) {
                                         HStack {
-                                            Text(line.label)
-                                                .font(.system(size: 14, weight: .bold))
-                                                .padding(.horizontal, 8)
-                                                .padding(.vertical, 4)
-                                                .background(busColor(for: line.line))
-                                                .foregroundColor(line.line.hasPrefix("5") ? .yellow : .white)
-                                                .cornerRadius(8)
+                                            LineNumberView(number: line.line)
                                             Text("Line \(line.line)")
                                                 .font(.headline)
                                         }
