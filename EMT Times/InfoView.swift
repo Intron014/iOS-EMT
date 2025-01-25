@@ -4,6 +4,7 @@ import SwiftData
 struct InfoView: View {
     @Environment(\.dismiss) var dismiss
     @State private var showingCredentials = false
+    @State private var showingCacheContent = false
     @AppStorage("mapPosition") private var mapPosition = "top"
     @AppStorage("mainView") private var mainView = "list"
     @AppStorage("showBusDistances") var showBusDistances = true
@@ -12,6 +13,8 @@ struct InfoView: View {
     let apiStats: ApiCounter?
     var refreshCallback: (() -> Void)? = nil
     @State private var showingFullSizeIcon: String?
+    @State private var showingStationCache = false
+    @State private var showingLineCache = false
     
     private func formattedLastUpdate() -> String {
         guard let lastUpdate = StationsCache.shared.lastUpdate else {
@@ -39,6 +42,10 @@ struct InfoView: View {
     private func refreshLineCache() {
         LineCache.shared.clearMemoryCache()
         refreshCallback?()
+    }
+    
+    private func busColor(for line: String) -> Color {
+        return (line.hasPrefix("5") && line.count == 3) ? .black : .blue
     }
     
     var body: some View {
@@ -80,18 +87,32 @@ struct InfoView: View {
                         Text("Daily Uses: \(stats.dailyUse)")
                         Text("Current Uses: \(stats.current)")
                         Text("Last Station Cache Update: \(formattedLastUpdate())")
-                            .swipeActions {
+                            .swipeActions(edge: .trailing, allowsFullSwipe: true) {
                                 Button(action: refreshCache) {
                                     Label("Refresh", systemImage: "arrow.clockwise")
                                 }
                                 .tint(.green)
+                                
+                                Button(action: {
+                                    showingStationCache = true
+                                }) {
+                                    Label("See", systemImage: "eye")
+                                }
+                                .tint(.blue)
                             }
                         Text("Last Line Cache Update: \(formattedLineLastUpdate())")
-                            .swipeActions {
+                            .swipeActions(edge: .trailing, allowsFullSwipe: true) {
                                 Button(action: refreshLineCache) {
                                     Label("Refresh", systemImage: "arrow.clockwise")
                                 }
                                 .tint(.green)
+                                
+                                Button(action: {
+                                    showingLineCache = true
+                                }) {
+                                    Label("See", systemImage: "eye")
+                                }
+                                .tint(.blue)
                             }
                     } else {
                         Text("No API statistics available")
@@ -158,6 +179,98 @@ struct InfoView: View {
             }
             .sheet(isPresented: $showingCredentials) {
                 CredentialsView(isPresented: $showingCredentials, refreshCallback: refreshCallback)
+            }
+            .sheet(isPresented: $showingStationCache) {
+                NavigationView {
+                    List {
+                        if let stations = StationsCache.shared.cachedStations {
+                            Section("Cached Stations (\(stations.count))") {
+                                ForEach(stations) { station in
+                                    VStack(alignment: .leading) {
+                                        Text(station.name)
+                                            .font(.headline)
+                                        Text("ID: \(station.id)")
+                                            .font(.caption)
+                                        Text("Lines: \(station.lines.joined(separator: ", "))")
+                                            .font(.caption)
+                                    }
+                                }
+                            }
+                        }
+                    }
+                    .navigationTitle("Stations Cache")
+                    .navigationBarItems(trailing: Button("Done") {
+                        showingStationCache = false
+                    })
+                }
+            }
+            .sheet(isPresented: $showingLineCache) {
+                NavigationView {
+                    List {
+                        if let lines = LineCache.shared.cachedLines {
+                            Section("Cached Lines (\(lines.count))") {
+                                ForEach(lines, id: \.line) { line in
+                                    VStack(alignment: .leading) {
+                                        HStack {
+                                            Text(line.label)
+                                                .font(.system(size: 14, weight: .bold))
+                                                .padding(.horizontal, 8)
+                                                .padding(.vertical, 4)
+                                                .background(busColor(for: line.line))
+                                                .foregroundColor(line.line.hasPrefix("5") ? .yellow : .white)
+                                                .cornerRadius(8)
+                                            Text("Line \(line.line)")
+                                                .font(.headline)
+                                        }
+                                        Text("\(line.nameA) ↔ \(line.nameB)")
+                                            .font(.caption)
+                                    }
+                                }
+                            }
+                        }
+                    }
+                    .navigationTitle("Lines Cache")
+                    .navigationBarItems(trailing: Button("Done") {
+                        showingLineCache = false
+                    })
+                }
+            }
+            .sheet(isPresented: $showingCacheContent) {
+                NavigationView {
+                    List {
+                        if let stations = StationsCache.shared.cachedStations {
+                            Section("Cached Stations (\(stations.count))") {
+                                ForEach(stations) { station in
+                                    VStack(alignment: .leading) {
+                                        Text(station.name)
+                                            .font(.headline)
+                                        Text("ID: \(station.id)")
+                                            .font(.caption)
+                                        Text("Lines: \(station.lines.joined(separator: ", "))")
+                                            .font(.caption)
+                                    }
+                                }
+                            }
+                        }
+                        
+                        if let lines = LineCache.shared.cachedLines {
+                            Section("Cached Lines (\(lines.count))") {
+                                ForEach(lines, id: \.line) { line in
+                                    VStack(alignment: .leading) {
+                                        Text("Line \(line.label)")
+                                            .font(.headline)
+                                        Text("\(line.nameA) ↔ \(line.nameB)")
+                                            .font(.caption)
+                                    }
+                                }
+                            }
+                        }
+                    }
+                    .navigationTitle("Cache Content")
+                    .navigationBarItems(trailing: Button("Done") {
+                        showingCacheContent = false
+                    })
+                }
             }
         }
     }
