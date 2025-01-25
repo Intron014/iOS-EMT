@@ -22,17 +22,23 @@ struct InfoView: View {
         return formatter.localizedString(for: lastUpdate, relativeTo: Date())
     }
     
+    private func formattedLineLastUpdate() -> String {
+        guard let lastUpdate = LineCache.shared.lastUpdate else {
+            return "Never"
+        }
+        let formatter = RelativeDateTimeFormatter()
+        formatter.unitsStyle = .full
+        return formatter.localizedString(for: lastUpdate, relativeTo: Date())
+    }
+    
     private func refreshCache() {
         StationsCache.shared.clearMemoryCache()
         refreshCallback?()
     }
     
-    private func changeAppIcon(to iconName: String?) {
-        UIApplication.shared.setAlternateIconName(iconName) { error in
-            if let error = error {
-                print("Error changing app icon: \(error.localizedDescription)")
-            }
-        }
+    private func refreshLineCache() {
+        LineCache.shared.clearMemoryCache()
+        refreshCallback?()
     }
     
     var body: some View {
@@ -73,9 +79,16 @@ struct InfoView: View {
                     if let stats = apiStats {
                         Text("Daily Uses: \(stats.dailyUse)")
                         Text("Current Uses: \(stats.current)")
-                        Text("Last Cache Update: \(formattedLastUpdate())")
+                        Text("Last Station Cache Update: \(formattedLastUpdate())")
                             .swipeActions {
                                 Button(action: refreshCache) {
+                                    Label("Refresh", systemImage: "arrow.clockwise")
+                                }
+                                .tint(.green)
+                            }
+                        Text("Last Line Cache Update: \(formattedLineLastUpdate())")
+                            .swipeActions {
+                                Button(action: refreshLineCache) {
                                     Label("Refresh", systemImage: "arrow.clockwise")
                                 }
                                 .tint(.green)

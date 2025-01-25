@@ -100,7 +100,7 @@ struct StopDetail: Codable {
     let name: String
     let geometry: Geometry
     let stop: String
-    let dataLine: [LineDetail]
+    let dataLine: [BusLineDetail]
     let postalAddress: String
 }
 
@@ -109,7 +109,7 @@ struct Geometry: Codable {
     let coordinates: [Double]
 }
 
-struct LineDetail: Codable {
+struct BusLineDetail: Codable {
     let headerB: String
     let direction: String
     let headerA: String
@@ -158,4 +158,20 @@ struct LineInfo: Codable {
     let nameA: String
     let nameB: String
     let to: String
+}
+
+struct LineDetailResponse: Codable {
+    let code: String
+    let data: [LineDetail]
+    let description: String
+}
+
+struct LineDetail: Codable {
+    let startDate: String
+    let group: String
+    let nameA: String
+    let endDate: String
+    let label: String
+    let nameB: String
+    let line: String
 }

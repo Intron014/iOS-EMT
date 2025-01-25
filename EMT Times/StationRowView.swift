@@ -8,8 +8,17 @@ struct LineNumberView: View {
         (number.hasPrefix("5") && number.count == 3) || number.hasPrefix("N")
     }
     
+    private var displayNumber: String {
+        if let lines = LineCache.shared.cachedLines {
+            if let lineInfo = lines.first(where: { $0.line == number }) {
+                return lineInfo.label
+            }
+        }
+        return number
+    }
+    
     var body: some View {
-        Text(number)
+        Text(displayNumber)
             .padding(.horizontal, 6)
             .padding(.vertical, 2)
             .background(isSpecialLine ? Color.black : Color.blue)

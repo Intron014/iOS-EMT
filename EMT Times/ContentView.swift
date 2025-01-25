@@ -151,7 +151,12 @@ struct ContentView: View {
                     }
                 }
                 
-                // Refresh in background if needed
+                // Check if we need to refresh line information
+                if LineCache.shared.shouldRefresh() {
+                    await fetchLineInfo()
+                }
+                
+                // Refresh stations in background if needed
                 if StationsCache.shared.shouldRefresh() {
                     isRefreshing = true
                     await fetchStations()
@@ -252,6 +257,30 @@ struct ContentView: View {
                     showingDataSourceAlert = true
                 }
             }
+        }
+    }
+
+    private func fetchLineInfo() async {
+        let dateFormatter = DateFormatter()
+        dateFormatter.dateFormat = "yyyyMMdd"
+        let dateString = dateFormatter.string(from: Date())
+        
+        guard let credential = credentials.first else { return }
+        
+        do {
+            let token = try await TokenManager.shared.getToken(using: credential)
+            
+            let url = URL(string: "https://openapi.emtmadrid.es/v2/transport/busemtmad/lines/info/\(dateString)/")!
+            var request = URLRequest(url: url)
+            request.httpMethod = "GET"
+            request.addValue("\(token)", forHTTPHeaderField: "accessToken")
+            
+            let (data, _) = try await URLSession.shared.data(for: request)
+            let response = try JSONDecoder().decode(LineDetailResponse.self, from: data)
+            LineCache.shared.saveLines(response.data)
+            
+        } catch {
+            print("Error fetching line info: \(error)")
         }
     }
 }
