@@ -15,7 +15,7 @@ enum SortOrder {
     case alphabetical
 }
 
-struct EMTView: View {    // Changed from ContentView to EMTView
+struct EMTView: View {
     @State private var errorMessage: String?
     @State private var stations: [Station] = []
     @Environment(\.modelContext) private var modelContext
