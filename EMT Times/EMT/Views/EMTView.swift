@@ -173,7 +173,11 @@ struct EMTView: View {
                 }
             }
             .sheet(isPresented: $showingCredentialsSheet) {
-                CredentialsView(isPresented: $showingCredentialsSheet)
+                CredentialsView(isPresented: $showingCredentialsSheet){
+                    Task {
+                        await fetchStations()
+                    }
+                }
             }
             .onAppear {
                 locationManager.requestLocation()
