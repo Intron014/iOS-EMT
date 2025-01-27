@@ -138,9 +138,6 @@ struct EMTView: View {
             )
             .searchable(text: $searchText, placement: .automatic, prompt: "Search by stop number or name")
             .task {
-                if credentials.isEmpty {
-                    showingCredentialsSheet = true
-                }
                 // Load cached data first
                 if let cached = StationsCache.shared.cachedStations {
                     stations = cached
@@ -180,6 +177,9 @@ struct EMTView: View {
             }
             .onAppear {
                 locationManager.requestLocation()
+                if credentials.isEmpty {
+                    showingCredentialsSheet = true
+                }
             }
         }
         .alert("Location Access Required", isPresented: .constant(locationManager.permissionDenied)) {
