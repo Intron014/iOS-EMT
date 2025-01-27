@@ -41,7 +41,7 @@ struct EMT_TimesApp: App {
     var body: some Scene {
         WindowGroup {
             Group {
-                EMTView()
+                EMTView(isSubApp: false)
             }
         }
         .modelContainer(modelContainer)
