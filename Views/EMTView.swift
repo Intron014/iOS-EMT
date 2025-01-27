@@ -16,6 +16,7 @@ enum SortOrder {
 }
 
 struct EMTView: View {
+    @Environment(\.dismiss) private var dismiss
     @State private var errorMessage: String?
     @State private var stations: [Station] = []
     @Environment(\.modelContext) private var modelContext
@@ -36,6 +37,7 @@ struct EMTView: View {
     @State private var dataSource: String = ""
     @State private var showingDataSourceAlert = false
     @AppStorage("mainView") private var mainView = "list"
+    let isSubApp: Bool
 
     var sortedStations: ([Station], [Station]) {
         var stationsToSort = self.stations.map { station -> Station in
@@ -116,7 +118,7 @@ struct EMTView: View {
                         Label("Farthest First", systemImage: "location.slash").tag(SortOrder.farToNear)
                         Label("Alphabetical", systemImage: "textformat").tag(SortOrder.alphabetical)
                         }
-                    } 
+                    }
                     Picker("View Type", selection: $mainView) {
                         Label("List View", systemImage: "list.bullet").tag("list")
                         Label("Map View", systemImage: "map").tag("map")
@@ -126,6 +128,14 @@ struct EMTView: View {
                         showingCredentialsSheet = true
                     }) {
                         Label("Configure API Credentials", systemImage: "key")
+                    }
+                    if isSubApp {
+                        Divider()
+                        Button(action: {
+                            dismiss()
+                        }) {
+                            Label("Back", systemImage: "chevron.left")
+                        }
                     }
                 } label: {
                     Image(systemName: "line.3.horizontal.decrease.circle")
