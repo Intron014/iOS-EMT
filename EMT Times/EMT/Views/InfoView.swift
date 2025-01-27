@@ -74,7 +74,7 @@ struct InfoView: View {
                 
                 Section("Developer") {
                     Text("Developer: Jorge Benjumea")
-                    Text("Version: 1.1")
+                    Text("Version: \(Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? "Unknown")")
                     Link("GitHub: @intron014", destination: URL(string: "https://github.com/intron014")!)
                 }
                 
