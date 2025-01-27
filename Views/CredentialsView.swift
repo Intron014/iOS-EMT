@@ -67,7 +67,7 @@ struct CredentialsView: View {
             isPresented = false
             refreshCallback?()
         } catch {
-            errorMessage = error.localizedDescription
+            errorMessage = "Oops, something went wrong. Please check your credentials and try again."
             showingError = true
         }
     }
