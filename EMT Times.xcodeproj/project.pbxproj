@@ -6,43 +6,19 @@
 	objectVersion = 77;
 	objects = {
 
-/* Begin PBXContainerItemProxy section */
-		D73F778D2D35522200CE2A4C /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = D73F77722D35522100CE2A4C /* Project object */;
-			proxyType = 1;
-			remoteGlobalIDString = D73F77792D35522100CE2A4C;
-			remoteInfo = "EMT Times";
-		};
-		D73F77972D35522200CE2A4C /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = D73F77722D35522100CE2A4C /* Project object */;
-			proxyType = 1;
-			remoteGlobalIDString = D73F77792D35522100CE2A4C;
-			remoteInfo = "EMT Times";
-		};
-/* End PBXContainerItemProxy section */
+/* Begin PBXBuildFile section */
+		D74EB5B92E5DB81C0002475E /* PrivacyInfo.xcprivacy in Resources */ = {isa = PBXBuildFile; fileRef = D74EB5B82E5DB81C0002475E /* PrivacyInfo.xcprivacy */; };
+/* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
 		D73F777A2D35522100CE2A4C /* EMT Times.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "EMT Times.app"; sourceTree = BUILT_PRODUCTS_DIR; };
-		D73F778C2D35522200CE2A4C /* EMT TimesTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "EMT TimesTests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
-		D73F77962D35522200CE2A4C /* EMT TimesUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "EMT TimesUITests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
+		D74EB5B82E5DB81C0002475E /* PrivacyInfo.xcprivacy */ = {isa = PBXFileReference; lastKnownFileType = text.xml; path = PrivacyInfo.xcprivacy; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
 		D73F777C2D35522100CE2A4C /* EMT Times */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
 			path = "EMT Times";
-			sourceTree = "<group>";
-		};
-		D73F778F2D35522200CE2A4C /* EMT TimesTests */ = {
-			isa = PBXFileSystemSynchronizedRootGroup;
-			path = "EMT TimesTests";
-			sourceTree = "<group>";
-		};
-		D73F77992D35522200CE2A4C /* EMT TimesUITests */ = {
-			isa = PBXFileSystemSynchronizedRootGroup;
-			path = "EMT TimesUITests";
 			sourceTree = "<group>";
 		};
 /* End PBXFileSystemSynchronizedRootGroup section */
@@ -55,29 +31,14 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-		D73F77892D35522200CE2A4C /* Frameworks */ = {
-			isa = PBXFrameworksBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-		D73F77932D35522200CE2A4C /* Frameworks */ = {
-			isa = PBXFrameworksBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
 		D73F77712D35522100CE2A4C = {
 			isa = PBXGroup;
 			children = (
+				D74EB5B82E5DB81C0002475E /* PrivacyInfo.xcprivacy */,
 				D73F777C2D35522100CE2A4C /* EMT Times */,
-				D73F778F2D35522200CE2A4C /* EMT TimesTests */,
-				D73F77992D35522200CE2A4C /* EMT TimesUITests */,
 				D73F777B2D35522100CE2A4C /* Products */,
 			);
 			sourceTree = "<group>";
@@ -86,8 +47,6 @@
 			isa = PBXGroup;
 			children = (
 				D73F777A2D35522100CE2A4C /* EMT Times.app */,
-				D73F778C2D35522200CE2A4C /* EMT TimesTests.xctest */,
-				D73F77962D35522200CE2A4C /* EMT TimesUITests.xctest */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -117,52 +76,6 @@
 			productReference = D73F777A2D35522100CE2A4C /* EMT Times.app */;
 			productType = "com.apple.product-type.application";
 		};
-		D73F778B2D35522200CE2A4C /* EMT TimesTests */ = {
-			isa = PBXNativeTarget;
-			buildConfigurationList = D73F77A32D35522200CE2A4C /* Build configuration list for PBXNativeTarget "EMT TimesTests" */;
-			buildPhases = (
-				D73F77882D35522200CE2A4C /* Sources */,
-				D73F77892D35522200CE2A4C /* Frameworks */,
-				D73F778A2D35522200CE2A4C /* Resources */,
-			);
-			buildRules = (
-			);
-			dependencies = (
-				D73F778E2D35522200CE2A4C /* PBXTargetDependency */,
-			);
-			fileSystemSynchronizedGroups = (
-				D73F778F2D35522200CE2A4C /* EMT TimesTests */,
-			);
-			name = "EMT TimesTests";
-			packageProductDependencies = (
-			);
-			productName = "EMT TimesTests";
-			productReference = D73F778C2D35522200CE2A4C /* EMT TimesTests.xctest */;
-			productType = "com.apple.product-type.bundle.unit-test";
-		};
-		D73F77952D35522200CE2A4C /* EMT TimesUITests */ = {
-			isa = PBXNativeTarget;
-			buildConfigurationList = D73F77A62D35522200CE2A4C /* Build configuration list for PBXNativeTarget "EMT TimesUITests" */;
-			buildPhases = (
-				D73F77922D35522200CE2A4C /* Sources */,
-				D73F77932D35522200CE2A4C /* Frameworks */,
-				D73F77942D35522200CE2A4C /* Resources */,
-			);
-			buildRules = (
-			);
-			dependencies = (
-				D73F77982D35522200CE2A4C /* PBXTargetDependency */,
-			);
-			fileSystemSynchronizedGroups = (
-				D73F77992D35522200CE2A4C /* EMT TimesUITests */,
-			);
-			name = "EMT TimesUITests";
-			packageProductDependencies = (
-			);
-			productName = "EMT TimesUITests";
-			productReference = D73F77962D35522200CE2A4C /* EMT TimesUITests.xctest */;
-			productType = "com.apple.product-type.bundle.ui-testing";
-		};
 /* End PBXNativeTarget section */
 
 /* Begin PBXProject section */
@@ -175,14 +88,6 @@
 				TargetAttributes = {
 					D73F77792D35522100CE2A4C = {
 						CreatedOnToolsVersion = 16.2;
-					};
-					D73F778B2D35522200CE2A4C = {
-						CreatedOnToolsVersion = 16.2;
-						TestTargetID = D73F77792D35522100CE2A4C;
-					};
-					D73F77952D35522200CE2A4C = {
-						CreatedOnToolsVersion = 16.2;
-						TestTargetID = D73F77792D35522100CE2A4C;
 					};
 				};
 			};
@@ -201,8 +106,6 @@
 			projectRoot = "";
 			targets = (
 				D73F77792D35522100CE2A4C /* EMT Times */,
-				D73F778B2D35522200CE2A4C /* EMT TimesTests */,
-				D73F77952D35522200CE2A4C /* EMT TimesUITests */,
 			);
 		};
 /* End PBXProject section */
@@ -212,20 +115,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-		D73F778A2D35522200CE2A4C /* Resources */ = {
-			isa = PBXResourcesBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-		D73F77942D35522200CE2A4C /* Resources */ = {
-			isa = PBXResourcesBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
+				D74EB5B92E5DB81C0002475E /* PrivacyInfo.xcprivacy in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -239,34 +129,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-		D73F77882D35522200CE2A4C /* Sources */ = {
-			isa = PBXSourcesBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-		D73F77922D35522200CE2A4C /* Sources */ = {
-			isa = PBXSourcesBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
 /* End PBXSourcesBuildPhase section */
-
-/* Begin PBXTargetDependency section */
-		D73F778E2D35522200CE2A4C /* PBXTargetDependency */ = {
-			isa = PBXTargetDependency;
-			target = D73F77792D35522100CE2A4C /* EMT Times */;
-			targetProxy = D73F778D2D35522200CE2A4C /* PBXContainerItemProxy */;
-		};
-		D73F77982D35522200CE2A4C /* PBXTargetDependency */ = {
-			isa = PBXTargetDependency;
-			target = D73F77792D35522100CE2A4C /* EMT Times */;
-			targetProxy = D73F77972D35522200CE2A4C /* PBXContainerItemProxy */;
-		};
-/* End PBXTargetDependency section */
 
 /* Begin XCBuildConfiguration section */
 		D73F779E2D35522200CE2A4C /* Debug */ = {
@@ -412,7 +275,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 1.0;
+				MARKETING_VERSION = 0.1;
 				PRODUCT_BUNDLE_IDENTIFIER = "com.intron014.EMT-Times";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_EMIT_LOC_STRINGS = YES;
@@ -445,84 +308,12 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 1.0;
+				MARKETING_VERSION = 0.1;
 				PRODUCT_BUNDLE_IDENTIFIER = "com.intron014.EMT-Times";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
-			};
-			name = Release;
-		};
-		D73F77A42D35522200CE2A4C /* Debug */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				BUNDLE_LOADER = "$(TEST_HOST)";
-				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = GH945RTPM7;
-				GENERATE_INFOPLIST_FILE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 18.2;
-				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = "com.intron014.EMT-TimesTests";
-				PRODUCT_NAME = "$(TARGET_NAME)";
-				SWIFT_EMIT_LOC_STRINGS = NO;
-				SWIFT_VERSION = 5.0;
-				TARGETED_DEVICE_FAMILY = "1,2";
-				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/EMT Times.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/EMT Times";
-			};
-			name = Debug;
-		};
-		D73F77A52D35522200CE2A4C /* Release */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				BUNDLE_LOADER = "$(TEST_HOST)";
-				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = GH945RTPM7;
-				GENERATE_INFOPLIST_FILE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 18.2;
-				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = "com.intron014.EMT-TimesTests";
-				PRODUCT_NAME = "$(TARGET_NAME)";
-				SWIFT_EMIT_LOC_STRINGS = NO;
-				SWIFT_VERSION = 5.0;
-				TARGETED_DEVICE_FAMILY = "1,2";
-				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/EMT Times.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/EMT Times";
-			};
-			name = Release;
-		};
-		D73F77A72D35522200CE2A4C /* Debug */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = GH945RTPM7;
-				GENERATE_INFOPLIST_FILE = YES;
-				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = "com.intron014.EMT-TimesUITests";
-				PRODUCT_NAME = "$(TARGET_NAME)";
-				SWIFT_EMIT_LOC_STRINGS = NO;
-				SWIFT_VERSION = 5.0;
-				TARGETED_DEVICE_FAMILY = "1,2";
-				TEST_TARGET_NAME = "EMT Times";
-			};
-			name = Debug;
-		};
-		D73F77A82D35522200CE2A4C /* Release */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = GH945RTPM7;
-				GENERATE_INFOPLIST_FILE = YES;
-				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = "com.intron014.EMT-TimesUITests";
-				PRODUCT_NAME = "$(TARGET_NAME)";
-				SWIFT_EMIT_LOC_STRINGS = NO;
-				SWIFT_VERSION = 5.0;
-				TARGETED_DEVICE_FAMILY = "1,2";
-				TEST_TARGET_NAME = "EMT Times";
 			};
 			name = Release;
 		};
@@ -543,24 +334,6 @@
 			buildConfigurations = (
 				D73F77A12D35522200CE2A4C /* Debug */,
 				D73F77A22D35522200CE2A4C /* Release */,
-			);
-			defaultConfigurationIsVisible = 0;
-			defaultConfigurationName = Release;
-		};
-		D73F77A32D35522200CE2A4C /* Build configuration list for PBXNativeTarget "EMT TimesTests" */ = {
-			isa = XCConfigurationList;
-			buildConfigurations = (
-				D73F77A42D35522200CE2A4C /* Debug */,
-				D73F77A52D35522200CE2A4C /* Release */,
-			);
-			defaultConfigurationIsVisible = 0;
-			defaultConfigurationName = Release;
-		};
-		D73F77A62D35522200CE2A4C /* Build configuration list for PBXNativeTarget "EMT TimesUITests" */ = {
-			isa = XCConfigurationList;
-			buildConfigurations = (
-				D73F77A72D35522200CE2A4C /* Debug */,
-				D73F77A82D35522200CE2A4C /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
